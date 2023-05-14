@@ -3,7 +3,7 @@ import os
 import math
 
 #change this
-chara_name = "ch_0306_a"
+chara_name = "ch_0088_a"
 files_path = "R:\\Assets\\com.sega.KemonoFriends3\\Charas"
 #change this
 
@@ -73,7 +73,7 @@ if not os.path.exists(tail_path):
     tail_path = f"{files_path}\\ch_{chara_id}_a_tail\\"
     if not os.path.exists(tail_path):
         tail_path = ""
-        
+
 tail_alt_path = f"{files_path}\\ch_{chara_id}_z_tail\\"
 if not os.path.exists(tail_alt_path):
     tail_alt_path = ""
@@ -91,9 +91,17 @@ if not os.path.exists(ears_alt_path):
 print(body_path, tail_path, tail_alt_path, ears_path, ears_alt_path)
  
 #textures
-tex_body = body_path + chara_name + "_body.png"
-tex_face = body_path + chara_name + "_face.png"
-tex_head = body_path + chara_name + "_head.png"
+tex_body = next((path for path in os.listdir(body_path) if path.endswith("_body.png")), "")
+if tex_body != "":
+    tex_body = body_path + tex_body
+    
+tex_face = next((path for path in os.listdir(body_path) if path.endswith("_face.png")), "")
+if tex_face != "":
+    tex_face = body_path + tex_face
+    
+tex_head = next((path for path in os.listdir(body_path) if path.endswith("_head.png")), "")
+if tex_head != "":
+    tex_head = body_path + tex_head
 
 tex_cheek = next((path for path in os.listdir(body_path) if path.endswith(".png") and path.startswith("cheek")), "")
 if tex_cheek != "":
@@ -116,7 +124,10 @@ tail_fbx = f"{tail_path}{tail_path.split(backslash)[-2]}.fbx" if tail_path != ""
 
 bpy.ops.object.select_all(action='DESELECT')
 body_name = body_path.split(backslash)[-2]
-bpy.ops.import_scene.fbx( filepath = body_fbx )
+try:
+    bpy.ops.import_scene.fbx( filepath = body_fbx )
+except:
+    pass
 main_body = bpy.data.objects[body_name]
 main_body.scale = [1,1,1]
 main_body.select_set(True)
@@ -139,6 +150,7 @@ for child in root_armature.children:
         child.hide_set(True)
 
 if ears_fbx != "":
+    fail = False
     ears_name = ears_path.split(backslash)[-2]
     bpy.ops.import_scene.fbx( filepath = ears_fbx )
     ears = bpy.data.objects[ears_name]
@@ -148,26 +160,31 @@ if ears_fbx != "":
     
     model = get_child(ears, "model")
     model.name = "md_ears"
-    model.modifiers[ears.name].object = root_armature
+    try:	
+        model.modifiers[ears.name].object = root_armature	
+    except:	
+        bpy.ops.object.delete()	
+        fail = True
     
-    select_object(model, "OBJECT")
-    matrixcopy = model.matrix_world.copy()
-    model.parent = root_armature
-    model.matrix_world = matrixcopy
+    if not fail:
+        select_object(model, "OBJECT")
+        matrixcopy = model.matrix_world.copy()
+        model.parent = root_armature
+        model.matrix_world = matrixcopy
+            
+        select_object(ears)
+        ears.data.edit_bones.remove(ears.data.edit_bones["root"])
         
-    select_object(ears)
-    ears.data.edit_bones.remove(ears.data.edit_bones["root"])
-    
-    obs = [root_armature, ears]
-    c = {}
-    c["object"] = root_armature
-    c["active_object"] = root_armature
-    c["selected_objects"] = obs
-    c["selected_editable_objects"] = obs
-    bpy.ops.object.join(c)
-    
-    select_object(root_armature)
-    root_armature.data.edit_bones["j_ear_root"].parent = root_armature.data.edit_bones["j_head"]
+        obs = [root_armature, ears]
+        c = {}
+        c["object"] = root_armature
+        c["active_object"] = root_armature
+        c["selected_objects"] = obs
+        c["selected_editable_objects"] = obs
+        bpy.ops.object.join(c)
+        
+        select_object(root_armature)
+        root_armature.data.edit_bones["j_ear_root"].parent = root_armature.data.edit_bones["j_head"]
 
 if tail_fbx != "":
     fail = False
@@ -179,10 +196,10 @@ if tail_fbx != "":
     
     model = get_child(tail, "model")
     model.name = "md_tail"
-    try:
-        model.modifiers[tail.name].object = root_armature
-    except:
-        bpy.ops.object.delete()
+    try:	
+        model.modifiers[tail.name].object = root_armature	
+    except:	
+        bpy.ops.object.delete()	
         fail = True
     
     if not fail:
