@@ -3,7 +3,7 @@ import os
 import math
 
 #change this
-chara_name = "ch_0088_a"
+chara_name = "ch_0318_e"
 files_path = "R:\\Assets\\com.sega.KemonoFriends3\\Charas"
 #change this
 
@@ -188,13 +188,19 @@ if ears_fbx != "":
 
 if tail_fbx != "":
     fail = False
-    tail_name = tail_path.split(backslash)[-2]
+    if chara_id == "0318":
+        tail_name = "Armature"
+    else:
+        tail_name = tail_path.split(backslash)[-2]
     bpy.ops.import_scene.fbx( filepath = tail_fbx )
     tail = bpy.data.objects[tail_name]
     tail.scale = [1,1,1]
     tail.location = root_armature.data.bones["j_lowerbody"].head_local
     
-    model = get_child(tail, "model")
+    if chara_id == "0318":
+        model = get_child(tail, "modal")
+    else:
+        model = get_child(tail, "model")
     model.name = "md_tail"
     try:	
         model.modifiers[tail.name].object = root_armature	
