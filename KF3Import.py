@@ -176,12 +176,12 @@ if ears_fbx != "":
         ears.data.edit_bones.remove(ears.data.edit_bones["root"])
         
         obs = [root_armature, ears]
-        c = {}
-        c["object"] = root_armature
-        c["active_object"] = root_armature
-        c["selected_objects"] = obs
-        c["selected_editable_objects"] = obs
-        bpy.ops.object.join(c)
+        with bpy.context.temp_override(
+                object = root_armature,
+                active_object = root_armature,
+                selected_objects = obs,
+                selected_editable_objects = obs):
+            bpy.ops.object.join()
         
         select_object(root_armature)
         root_armature.data.edit_bones["j_ear_root"].parent = root_armature.data.edit_bones["j_head"]
@@ -218,12 +218,12 @@ if tail_fbx != "":
         tail.data.edit_bones.remove(tail.data.edit_bones["root"])
         
         obs = [root_armature, tail]
-        c = {}
-        c["object"] = root_armature
-        c["active_object"] = root_armature
-        c["selected_objects"] = obs
-        c["selected_editable_objects"] = obs
-        bpy.ops.object.join(c)
+        with bpy.context.temp_override(
+                object = root_armature,
+                active_object = root_armature,
+                selected_objects = obs,
+                selected_editable_objects = obs):
+            bpy.ops.object.join()
         
         select_object(root_armature)
         root_armature.data.edit_bones["j_tail_root"].parent = root_armature.data.edit_bones["j_lowerbody"]
